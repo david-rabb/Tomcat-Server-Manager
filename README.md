@@ -7,7 +7,7 @@ This is about 10 years overdue, but the text-based ManagerServlet has been exten
 
 To add this functionality to your Tomcat 8 server
 
-1. Build the source or download drx-server-manager.jar
+1. Build the source or download [drx-server-manager.jar](https://github.com/david-rabb/Tomcat-Server-Manager/releases/download/R1/drx-server-manager-8.0.jar)
 2. Edit manager/WEB-INF/web.xml, changing the classname of org.apache.catalina.manager.ManagerServlet to __drx.tomcat.ServerManagerServlet__
 3. Invoke the manager servlet according to your config, e.g. 
 
