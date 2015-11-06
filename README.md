@@ -1,4 +1,4 @@
-# Tomcat-Server-Manager
+# Tomcat Server Manager
 A simple extension to Apache Tomcat 8 to allow the ManagerServlet to manage webapps in any virtual host on the server.
 
 The manager webapp included with Apache Tomcat lets you manage the other webapps installed in the same virtual host. It provides webapp functions for listing, reloading, deploying, etc., but the manager webapp has to be installed in each virtual host, causing both runtime and configuration overhead for servers with many virtual hosts.
