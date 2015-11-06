@@ -12,3 +12,7 @@ To add this functionality to your Tomcat 8 server
 3. Invoke the manager servlet according to your config, e.g. 
 
    > curl -u user:pass http://localhost:8443/tomcat/text/reload?path=/contextname&host=github.com
+
+## Requirements
+* JDK 8
+* Tomcat 8
