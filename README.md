@@ -8,7 +8,7 @@ This is about 10 years overdue, but the text-based ManagerServlet has been exten
 To add this functionality to your Tomcat 8 server
 
 1. Build the source or download drx-server-manager.jar
-2. Edit manager/WEB-INF/web.xml, changing the classname of org.apache.catalina.manager.ManagerServlet to drx.tomcat.ServerManagerServlet
+2. Edit manager/WEB-INF/web.xml, changing the classname of org.apache.catalina.manager.ManagerServlet to __drx.tomcat.ServerManagerServlet__
 3. Invoke the manager servlet according to your config, e.g. 
 
    > curl -u user:pass http://localhost:8443/tomcat/text/reload?path=/contextname&host=github.com
