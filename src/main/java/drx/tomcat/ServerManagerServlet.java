@@ -100,7 +100,8 @@ public class ServerManagerServlet extends ManagerServlet {
                 return;
             }
             // It isn't possible for the manager to reload itself
-            if (context.getName().equals(this.context.getName())) {
+            if (context.getName().equals(this.context.getName()) &&
+                    host.getName().equals(aHost.getName())) {
                 writer.println(smClient.getString("managerServlet.noSelf"));
                 return;
             }
@@ -127,11 +128,10 @@ public class ServerManagerServlet extends ManagerServlet {
       
       String hostName = request.getParameter("host");
       
-      if (command!=null && hostName!=null && command.equals("/reload")) {
-        
+      if (command!=null && hostName!=null) {
         Engine engine = (Engine)host.getParent();
         Host aHost = (Host)engine.findChild(hostName);
-        
+
         String path = request.getParameter("path");
         ContextName cn = null;
         if (path != null) {
@@ -139,7 +139,14 @@ public class ServerManagerServlet extends ManagerServlet {
         }
         response.setContentType("text/plain; charset=" + Constants.CHARSET);
         PrintWriter writer = response.getWriter();
-        reload(writer, aHost, cn, smClient);
+        
+        if (command.equals("/reload")) {
+            reload(writer, aHost, cn, smClient);
+        } else if (command.equals("/start")) {
+            start(writer, aHost, cn, smClient);
+        } else if (command.equals("/stop")) {
+            stop(writer, aHost, cn, smClient);
+        }
         writer.flush();
         writer.close();
         
@@ -147,4 +154,95 @@ public class ServerManagerServlet extends ManagerServlet {
         super.doGet(request, response);
       }
     }    
+    
+    /**
+     * Start the web application at the specified context path.
+     *
+     * @param writer Writer to render to
+     * @param cn Name of the application to be started
+     */
+    protected void start(PrintWriter writer, Host aHost, ContextName cn,
+            StringManager smClient) {
+
+        if (debug >= 1)
+            log("start: Starting web application '" + cn + "'");
+
+        if (!validateContextName(cn, writer, smClient)) {
+            return;
+        }
+
+        String displayPath = cn.getDisplayName();
+
+        try {
+            Context context = (Context) aHost.findChild(cn.getName());
+            if (context == null) {
+                writer.println(smClient.getString("managerServlet.noContext",
+                        RequestUtil.filter(displayPath)));
+                return;
+            }
+            context.start();
+            if (context.getState().isAvailable())
+                writer.println(smClient.getString("managerServlet.started",
+                        displayPath));
+            else
+                writer.println(smClient.getString("managerServlet.startFailed",
+                        displayPath));
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            getServletContext().log(sm.getString("managerServlet.startFailed",
+                    displayPath), t);
+            writer.println(smClient.getString("managerServlet.startFailed",
+                    displayPath));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
+        }
+
+    }
+
+
+    /**
+     * Stop the web application at the specified context path.
+     *
+     * @param writer Writer to render to
+     * @param cn Name of the application to be stopped
+     */
+    protected void stop(PrintWriter writer, Host aHost, ContextName cn,
+            StringManager smClient) {
+
+        if (debug >= 1)
+            log("stop: Stopping web application '" + cn + "'");
+
+        if (!validateContextName(cn, writer, smClient)) {
+            return;
+        }
+
+        String displayPath = cn.getDisplayName();
+
+        try {
+            Context context = (Context) aHost.findChild(cn.getName());
+            if (context == null) {
+                writer.println(smClient.getString("managerServlet.noContext",
+                        RequestUtil.filter(displayPath)));
+                return;
+            }
+            // It isn't possible for the manager to stop itself
+            if (context.getName().equals(this.context.getName()) &&
+                    host.getName().equals(aHost.getName())) {
+                writer.println(smClient.getString("managerServlet.noSelf"));
+                return;
+            }
+            context.stop();
+            writer.println(smClient.getString(
+                    "managerServlet.stopped", displayPath));
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log("ManagerServlet.stop[" + displayPath + "]", t);
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
+        }
+
+    }
+
+
+    
 }
